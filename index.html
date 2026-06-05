@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Umidade do Solo</title>
+    <link rel="shortcut icon" href="./imgs/favicon.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Monitor IoT da Horta</h1>
+            <div class="pump-badge" id="pump-badge">
+                <div class="pump-dot"></div>
+                BOMBA: <span id="pump-text">OFF</span>
+            </div>
+            <div class="status-panel">
+                <div class="led" id="connection-led"></div>
+                <span id="connection-text">Conectando...</span>
+            </div>
+        </header>
+
+        <main class="dashboard-grid">
+            <!-- CARD 1: UMIDADE -->
+            <div class="card">
+                <h2>Umidade Atual</h2>
+                <div class="gauge-container">
+                    <svg class="gauge-svg" viewBox="0 0 200 200">
+                        <circle class="gauge-bg" cx="100" cy="100" r="80"></circle>
+                        <circle class="gauge-progress" id="gauge-bar" cx="100" cy="100" r="80"></circle>
+                    </svg>
+                    <div class="gauge-text-container">
+                        <div class="gauge-value" id="moisture-value">--%</div>
+                        <div id="moisture-status" style="font-weight: 600; margin-top: 5px;">Avaliando...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARD 2: LIMIARES-->
+            <div class="card">
+                <h2>Limiares de Alerta</h2>
+                
+                <div class="settings-group">
+                    <div class="settings-header">
+                        <span>Limiar Seco (Irrigar)</span>
+                        <strong id="dry-label" style="color: var(--color-dry)">40%</strong>
+                    </div>
+                    <input type="range" id="dry-slider" min="0" max="100" value="40">
+                </div>
+
+                <div class="settings-group">
+                    <div class="settings-header">
+                        <span>Limiar Encharcado</span>
+                        <strong id="wet-label" style="color: var(--color-wet)">80%</strong>
+                    </div>
+                    <input type="range" id="wet-slider" min="0" max="100" value="80">
+                </div>
+                
+                <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: 20px;">
+                    <p style="font-size: 0.8rem; color: var(--text-muted); max-width: 180px;">Ajuste com base na sua planta.</p>
+                    <button class="info-btn" onclick="toggleModal(true)">Ver Dicas</button>
+                </div>
+            </div>
+
+            <!-- CARD 3: GRÁFICO -->
+            <div class="card chart-card">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center;">
+                    <h2 id="chart-title">Histórico (Tempo Real)</h2>
+                    <div style="display: flex; background: var(--bg-color); padding: 4px; border-radius: 8px; gap: 5px;">
+                        <button class="filter-btn active" id="btn-rt" onclick="updateChartMode('realtime')">Tempo Real</button>
+                        <button class="filter-btn" id="btn-hist" onclick="updateChartMode('history')">7 Dias</button>
+                    </div>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="historyChart"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="plant-modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 20px;">Sugestões por Planta</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 12px 0;">Suculentas</td>
+                    <td style="color: var(--text-muted);">15% / 50%</td>
+                    <td style="text-align: right;"><button class="info-btn" onclick="setThresholds(15, 50)">Usar</button></td>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 12px 0;">Hortaliças</td>
+                    <td style="color: var(--text-muted);">40% / 85%</td>
+                    <td style="text-align: right;"><button class="info-btn" onclick="setThresholds(40, 85)">Usar</button></td>
+                </tr>
+                <tr>
+                    <td style="padding: 12px 0;">Tropicais</td>
+                    <td style="color: var(--text-muted);">55% / 90%</td>
+                    <td style="text-align: right;"><button class="info-btn" onclick="setThresholds(55, 90)">Usar</button></td>
+                </tr>
+            </table>
+            <button class="info-btn" style="width: 100%; margin-top: 25px; padding: 12px;" onclick="toggleModal(false)">Fechar</button>
+        </div>
+    </div>
+</body>
+    <script src="./index.js"></script>
+</html>
